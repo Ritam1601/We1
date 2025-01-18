@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Good Evening Greeting with Party Popper</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f7e6d2;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .container {
+      text-align: center;
+      background: #fff5e1;
+      border: 2px solid #ffb84d;
+      border-radius: 10px;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+      padding: 20px;
+      width: 300px;
+      position: relative;
+      z-index: 2;
+    }
+    input {
+      padding: 10px;
+      width: 80%;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #ff8c1a;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #e67300;
+    }
+    .poem {
+      font-size: 1.2em;
+      color: #4d2600;
+      line-height: 1.5;
+      display: none;
+      text-align: center;
+    }
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="confettiCanvas"></canvas>
+  <div class="container" id="inputContainer">
+    <p>Enter your name:</p>
+    <input type="text" id="nameInput" placeholder="Your name here">
+    <button onclick="greet()">Submit</button>
+  </div>
+  <div class="poem" id="greetingPoem"></div>
+
+  <script>
+    function greet() {
+      const name = document.getElementById('nameInput').value.trim();
+      if (name) {
+        document.getElementById('inputContainer').style.display = 'none'; // Hide input box and button
+        const poemElement = document.getElementById('greetingPoem');
+        poemElement.innerHTML = `
+          <p>Good evening <strong>${name}</strong>, my dear,<br>
+          As the day fades, the night draws near.<br>
+          May peace and joy in your heart stay,<br>
+          And brighten the rest of your day.</p>
+        `;
+        poemElement.style.display = 'block'; // Show the poem
+        launchConfetti(); // Trigger the party popper effect
+      } else {
+        alert('Please enter your name to continue.');
+      }
+    }
+
+    // Party Popper Confetti Effect
+    function launchConfetti() {
+      const canvas = document.getElementById('confettiCanvas');
+      const context = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const particles = [];
+      const colors = ['#ff6384', '#36a2eb', '#ffce56', '#4bc0c0', '#9966ff'];
+
+      function createParticles() {
+        for (let i = 0; i < 100; i++) {
+          particles.push({
+            x: canvas.width / 2,
+            y: canvas.height / 2,
+            radius: Math.random() * 5 + 2,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            velocityX: Math.random() * 6 - 3,
+            velocityY: Math.random() * 6 - 3,
+            alpha: 1,
+            decay: Math.random() * 0.03 + 0.01,
+          });
+        }
+      }
+
+      function drawParticles() {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach((particle, index) => {
+          context.beginPath();
+          context.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+          context.fillStyle = `rgba(${hexToRgb(particle.color)}, ${particle.alpha})`;
+          context.fill();
+          particle.x += particle.velocityX;
+          particle.y += particle.velocityY;
+          particle.alpha -= particle.decay;
+
+          // Remove particles that are invisible
+          if (particle.alpha <= 0) {
+            particles.splice(index, 1);
+          }
+        });
+
+        if (particles.length > 0) {
+          requestAnimationFrame(drawParticles);
+        }
+      }
+
+      function hexToRgb(hex) {
+        const bigint = parseInt(hex.slice(1), 16);
+        const r = (bigint >> 16) & 255;
+        const g = (bigint >> 8) & 255;
+        const b = bigint & 255;
+        return `${r}, ${g}, ${b}`;
+      }
+
+      createParticles();
+      drawParticles();
+    }
+  </script>
+</body>
+</html>
